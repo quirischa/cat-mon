@@ -1,4 +1,4 @@
-from telegram.ext import Updater, MessageHandler, Filters, CommandHandler
+from telegram.ext import Updater, MessageHandler, filters, CommandHandler
 from config import BOT_TOKEN
 
 # Обработка команды /start
@@ -21,7 +21,7 @@ def main():
 
     # Добавьте обработчики команды /start и обычных сообщений
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    dp.add_handler(MessageHandler(filters.text & ~filters.command, echo))
 
     # Запустите бота
     updater.start_polling()
