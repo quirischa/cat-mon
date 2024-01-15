@@ -1,4 +1,5 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from config import BOT_TOKEN
 
 # Словарь для хранения имен котов
 cat_names = {}
