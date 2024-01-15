@@ -3,6 +3,7 @@ from config import BOT_TOKEN
 
 # Определение состояний
 ENTER_CAT_NAME = 1
+CONFIRM_DELETE = 2
 
 # Словарь для хранения имен котов
 cat_names = {}
@@ -30,15 +31,38 @@ def view_cat(update, context):
     else:
         context.bot.send_message(chat_id=update.message.chat_id, text="Кот не найден, добавьте кота командой /add")
 
+def delete_cat(update, context):
+    cat_name = cat_names.get(update.message.chat_id)
+    if cat_name:
+        context.bot.send_message(chat_id=update.message.chat_id, text=f"Вы уверены, что хотите удалить кота {cat_name}? (Да/Нет)")
+        return CONFIRM_DELETE
+    else:
+        context.bot.send_message(chat_id=update.message.chat_id, text="Кот не найден.")
+
+def confirm_delete(update, context):
+    confirmation = update.message.text.lower()
+    if confirmation == 'да':
+        del cat_names[update.message.chat_id]
+        context.bot.send_message(chat_id=update.message.chat_id, text="Кот удален.")
+    else:
+        context.bot.send_message(chat_id=update.message.chat_id, text="Отменено.")
+
+    # Возвращаем в начальное состояние
+    return ConversationHandler.END
+
 def main():
     updater = Updater(BOT_TOKEN, use_context=True)
     dp = updater.dispatcher
 
     # Добавляем ConversationHandler для управления состояниями
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('add', add_cat)],
+        entry_points=[
+            CommandHandler('add', add_cat),
+            CommandHandler('delete', delete_cat)
+        ],
         states={
             ENTER_CAT_NAME: [MessageHandler(Filters.text, save_cat_name)],
+            CONFIRM_DELETE: [MessageHandler(Filters.text, confirm_delete)],
         },
         fallbacks=[]
     )
